@@ -12,7 +12,7 @@ usermod -o -u "$PUID" code-server
 
 chown -R code-server:code-server /config
 
-if [ -z "$1" || "$1" == "code-server" ]; then
+if [[ -z "$1" || "$1" = "code-server" ]]; then
     if [ -n "${SUDO_PASSWORD}" ] || [ -n "${SUDO_PASSWORD_HASH}" ]; then
         echo "setting up sudo access"
         if ! grep -q 'code-server' /etc/sudoers; then
