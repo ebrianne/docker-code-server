@@ -8,7 +8,7 @@ ENV HOME="/config"
 ENV TZ="Europe/Berlin"
 
 RUN apt-get update && apt-get -y install apt-utils locales && \
-    apt-get -y install bash curl zsh gosu sudo nano tzdata ca-certificates git python3.7 python3-pip && \ 
+    apt-get -y install bash curl wget zsh gosu sudo nano tzdata ca-certificates git python3.7 python3-pip && \ 
     rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/*
 RUN useradd -u 1000 -U -d /config -s /bin/false code-server && usermod -G code-server code-server
 RUN if [ -z ${CODE_RELEASE+x} ]; then \
