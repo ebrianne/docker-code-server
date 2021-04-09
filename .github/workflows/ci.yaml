@@ -4,14 +4,13 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "0 * * * *"
-  push:
 
 jobs:
   check-tag:
     runs-on: ubuntu-latest
     outputs:
       current_tag: ${{ steps.get-diff-result.outputs.current_tag }}
-      code-server-version: ${{ steps.get-diff-result.outputs.code_version }}
+      code_version: ${{ steps.get-diff-result.outputs.code_version }}
       is-different: ${{ steps.get-diff-result.outputs.result }}
     steps:
       - name: Checkout
@@ -54,7 +53,7 @@ jobs:
     steps:
       - name: Echo variables
         run: |
-          echo "Version of code-server is ${{ needs.check_tag.outputs.code-server-version }}"
+          echo "Version of code-server is ${{ needs.check_tag.outputs.code_version }}"
       
       - name: Checkout
         uses: actions/checkout@v2
@@ -81,11 +80,11 @@ jobs:
           file: ./Dockerfile
           platforms: linux/arm64,linux/amd64
           push: true
-          build-args: CODE_RELEASE=${{ needs.check_tag.outputs.code-server-version }}
-          tags: ebrianne/code-server:${{ needs.check_tag.outputs.code-server-version }}
+          build-args: CODE_RELEASE=${{ needs.check_tag.outputs.code_version }}
+          tags: ebrianne/code-server:${{ needs.check_tag.outputs.code_version }}
 
       - name: Tag commit
         uses: tvdias/github-tagger@v0.0.2
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          tag: "${{ needs.check_tag.outputs.code-server-version }}"
+          tag: "${{ needs.check_tag.outputs.code_version }}"
