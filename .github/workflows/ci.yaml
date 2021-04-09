@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "0 * * * *"
+  push:
 
 jobs:
   check-tag:
@@ -51,6 +52,10 @@ jobs:
     needs: check-tag
     if: ${{ needs.check-tag.outputs.is-different == 'true' }}
     steps:
+      - name: Echo variables
+        run: |
+          echo "Version of code-server is ${{ needs.check_tag.outputs.code-server-version }}"
+      
       - name: Checkout
         uses: actions/checkout@v2
         with:
