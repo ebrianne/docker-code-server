@@ -76,7 +76,7 @@ jobs:
           platforms: linux/arm64,linux/amd64
           push: true
           build_args: CODE_RELEASE=${{ needs.check_tag.outputs.code-server-version }}
-          tags: ebrianne/docker-deluge-openvpn:${{ needs.check_tag.outputs.code-server-version }}
+          tags: ebrianne/code-server:${{ needs.check_tag.outputs.code-server-version }}
 
       - name: Tag commit
         uses: tvdias/github-tagger@v0.0.2
