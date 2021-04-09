@@ -8,10 +8,7 @@ on:
 jobs:
   check-tag:
     runs-on: ubuntu-latest
-    outputs:
-      current_tag: ${{ steps.get-diff-result.outputs.current_tag }}
-      code_version: ${{ steps.get-diff-result.outputs.code_version }}
-      is_different: ${{ steps.get-diff-result.outputs.result }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -46,15 +43,21 @@ jobs:
           echo "Current tag is ${{ steps.get-diff-result.outputs.current_tag }}"
           echo "Current code-server tag is ${{ steps.get-diff-result.outputs.code_version }}"
 
+    outputs:
+      tag: ${{ steps.get-diff-result.outputs.current_tag }}
+      version: ${{ steps.get-diff-result.outputs.code_version }}
+      is_different: ${{ steps.get-diff-result.outputs.result }}
+
   build-docker:
     runs-on: ubuntu-latest 
     needs: check-tag
     if: |
       (needs.check-tag.outputs.is_different == 'true')
+    
     steps:
       - name: Echo variables
         run: |
-          echo "Version of code-server is ${{ needs.check_tag.outputs.code_version }}"
+          echo "Version of code-server is ${{ needs.check_tag.outputs.version }}"
       
       - name: Checkout
         uses: actions/checkout@v2
@@ -81,11 +84,11 @@ jobs:
           file: ./Dockerfile
           platforms: linux/arm64,linux/amd64
           push: true
-          build-args: CODE_RELEASE=${{ needs.check_tag.outputs.code_version }}
-          tags: ebrianne/code-server:${{ needs.check_tag.outputs.code_version }}
+          build-args: CODE_RELEASE=${{ needs.check_tag.outputs.version }}
+          tags: ebrianne/code-server:${{ needs.check_tag.outputs.version }}
 
       - name: Tag commit
         uses: tvdias/github-tagger@v0.0.2
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          tag: "${{ needs.check_tag.outputs.code_version }}"
+          tag: "${{ needs.check_tag.outputs.version }}"
