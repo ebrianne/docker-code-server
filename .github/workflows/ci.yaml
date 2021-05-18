@@ -52,9 +52,18 @@ jobs:
       (needs.check-tag.outputs.is_different == 'true')
     
     steps:
+      - name: Get tag
+        id: get-vs-tag
+        run: |
+          set -e
+          set -o pipefail
+
+          CODE_RELEASE=$(curl -sX GET "https://api.github.com/repos/cdr/code-server/releases/latest" | tac | tac | awk '/tag_name/{print $4;exit}' FS='[""]')
+          echo "::set-output name=code_version::${CODE_RELEASE}"
+
       - name: Echo variables
         run: |
-          echo "Version of code-server is ${{ needs.check_tag.outputs.latest_tag }}"
+          echo "Version of code-server is ${{ steps.get-vs-tag.outputs.code_version }}"
       
       - name: Checkout
         uses: actions/checkout@v2
@@ -81,11 +90,11 @@ jobs:
           file: ./Dockerfile
           platforms: linux/arm64,linux/amd64
           push: true
-          build-args: CODE_RELEASE=${{ needs.check_tag.outputs.latest_tag }}
-          tags: ebrianne/code-server:${{ needs.check_tag.outputs.latest_tag }}
+          build-args: CODE_RELEASE=${{ steps.get-vs-tag.outputs.code_version }}
+          tags: ebrianne/code-server:${{ steps.get-vs-tag.outputs.code_version }}
 
       - name: Tag commit
         uses: tvdias/github-tagger@v0.0.2
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          tag: "${{ needs.check_tag.outputs.latest_tag }}"
+          tag: "${{ steps.get-vs-tag.outputs.code_version }}"
